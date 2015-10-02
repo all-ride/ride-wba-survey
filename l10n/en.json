@@ -1,0 +1,13 @@
+{
+    "label.answer": "Antwoord",
+    "label.answers": "Answers",
+    "label.question": "Question",
+    "label.question.open": "Open question",
+    "label.question.open.description": "Add a free text field to the answers",
+    "label.question.multiple": "Multiple answers",
+    "label.question.multiple.description": "Multiple answers can be selected",
+    "label.score": "Score",
+    "title.likert": "Likert-scales",
+    "title.questions": "Questions",
+    "title.surveys": "Surveys"
+}

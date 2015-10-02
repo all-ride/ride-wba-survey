@@ -1,0 +1,46 @@
+{
+    "routes": [
+        {
+            "path": "/admin/surveys",
+            "controller": "ride\\web\\orm\\controller\\SurveyController",
+            "action": "indexAction",
+            "id": "survey"
+        },
+        {
+            "path": "/admin/surveys/%locale%",
+            "controller": "ride\\web\\orm\\controller\\SurveyController",
+            "action": "indexAction",
+            "id": "survey.overview"
+        },
+        {
+            "path": "/admin/surveys/%locale%/add",
+            "controller": "ride\\web\\orm\\controller\\SurveyController",
+            "action": "formAction",
+            "id": "survey.add"
+        },
+        {
+            "path": "/admin/surveys/%locale%/%id%/detail",
+            "controller": "ride\\web\\orm\\controller\\SurveyController",
+            "action": "detailAction",
+            "id": "survey.detail"
+        },
+        {
+            "path": "/admin/surveys/%locale%/%id%/edit",
+            "controller": "ride\\web\\orm\\controller\\SurveyController",
+            "action": "formAction",
+            "id": "survey.edit"
+        },
+        {
+            "path": "/admin/surveys/%locale%/%survey%/questions/add",
+            "controller": "ride\\web\\orm\\controller\\SurveyController",
+            "action": "questionFormAction",
+            "id": "survey.question.add"
+        },
+        {
+            "path": "/admin/surveys/%locale%/%survey%/questions/%id%/edit",
+            "controller": "ride\\web\\orm\\controller\\SurveyController",
+            "action": "questionFormAction",
+            "id": "survey.question.edit"
+        }
+    ]
+}
