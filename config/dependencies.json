@@ -1,0 +1,134 @@
+{
+    "dependencies": [
+        {
+            "class": "ride\\web\\orm\\controller\\SurveyEvaluationController",
+            "calls": [
+                {
+                    "method": "__construct",
+                    "arguments": [
+                        {
+                            "name": "model",
+                            "type": "call",
+                            "properties": {
+                                "interface": "ride\\library\\orm\\OrmManager",
+                                "method": "getSurveyEvaluationModel"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "class": "ride\\web\\orm\\controller\\SurveyLikertController",
+            "calls": [
+                {
+                    "method": "__construct",
+                    "arguments": [
+                        {
+                            "name": "model",
+                            "type": "call",
+                            "properties": {
+                                "interface": "ride\\library\\orm\\OrmManager",
+                                "method": "getSurveyLikertModel"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "class": "ride\\web\\orm\\controller\\SurveyController",
+            "calls": [
+                {
+                    "method": "__construct",
+                    "arguments": [
+                        {
+                            "name": "model",
+                            "type": "call",
+                            "properties": {
+                                "interface": "ride\\library\\orm\\OrmManager",
+                                "method": "getSurveyModel"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "method": "setRoute",
+                    "arguments": [
+                        {
+                            "name": "action",
+                            "type": "scalar",
+                            "properties": {
+                                "value": "index"
+                            }
+                        },
+                        {
+                            "name": "routeId",
+                            "type": "scalar",
+                            "properties": {
+                                "value": "survey.overview"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "method": "setRoute",
+                    "arguments": [
+                        {
+                            "name": "action",
+                            "type": "scalar",
+                            "properties": {
+                                "value": "add"
+                            }
+                        },
+                        {
+                            "name": "routeId",
+                            "type": "scalar",
+                            "properties": {
+                                "value": "survey.add"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "method": "setRoute",
+                    "arguments": [
+                        {
+                            "name": "action",
+                            "type": "scalar",
+                            "properties": {
+                                "value": "detail"
+                            }
+                        },
+                        {
+                            "name": "routeId",
+                            "type": "scalar",
+                            "properties": {
+                                "value": "survey.detail"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "method": "setRoute",
+                    "arguments": [
+                        {
+                            "name": "action",
+                            "type": "scalar",
+                            "properties": {
+                                "value": "edit"
+                            }
+                        },
+                        {
+                            "name": "routeId",
+                            "type": "scalar",
+                            "properties": {
+                                "value": "survey.edit"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }        
+    ]
+}

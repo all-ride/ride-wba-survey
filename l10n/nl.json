@@ -1,0 +1,17 @@
+{
+    "label.answer": "Antwoord",
+    "label.answer.likert.description": "Verfijn dit antwoord met een Likert schaal",
+    "label.answers": "Antwoorden",
+    "label.likert": "Likert schaal",
+    "label.question": "Vraag",
+    "label.question.open": "Open vraag",
+    "label.question.open.description": "Voeg een vrij text veld toe aan de antwoorden",
+    "label.question.multiple": "Meerdere antwoorden",
+    "label.question.multiple.description": "Meerdere antwoorden kunnen geselecteerd worden",
+    "label.survey.score": "Punten",
+    "label.survey.score.description": "Aantal punten voor dit antwoord",
+    "title.evaluations": "Evaluaties",
+    "title.likert": "Likert schalen",
+    "title.questions": "Vragen",
+    "title.surveys": "Enquêtes"
+}
