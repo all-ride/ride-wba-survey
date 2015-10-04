@@ -2,6 +2,9 @@
 
 namespace ride\web\orm\controller;
 
+/**
+ * Controller to manage the survey likert scales
+ */
 class SurveyLikertController extends ScaffoldController {
 
     /**
