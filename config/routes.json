@@ -31,6 +31,18 @@
             "id": "survey.edit"
         },
         {
+            "path": "/admin/surveys/%locale%/%survey%/entries",
+            "controller": "ride\\web\\orm\\controller\\SurveyController",
+            "action": "entriesAction",
+            "id": "survey.entry"
+        },
+        {
+            "path": "/admin/surveys/%locale%/%survey%/entries/%id%",
+            "controller": "ride\\web\\orm\\controller\\SurveyController",
+            "action": "entryAction",
+            "id": "survey.entry.detail"
+        },
+        {
             "path": "/admin/surveys/%locale%/%survey%/questions/add",
             "controller": "ride\\web\\orm\\controller\\SurveyController",
             "action": "questionFormAction",

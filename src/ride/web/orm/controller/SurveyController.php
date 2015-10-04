@@ -7,13 +7,15 @@ use ride\library\orm\entry\format\EntryFormatter;
 use ride\library\orm\model\Model;
 use ride\library\reflection\ReflectionHelper;
 
-// use ride\web\orm\form\ScaffoldComponent;
 use ride\web\orm\form\QuestionAnswerComponent;
 use ride\web\orm\table\scaffold\decorator\DataDecorator;
 use ride\web\orm\table\scaffold\decorator\LocalizeDecorator;
 use ride\web\orm\table\scaffold\ScaffoldTable;
 use ride\web\WebApplication;
 
+/**
+ * Controller to manage the surveys
+ */
 class SurveyController extends ScaffoldController {
 
     /**
@@ -24,13 +26,13 @@ class SurveyController extends ScaffoldController {
      */
     protected function getIndexActions($locale) {
         return array(
-            $this->getUrl('system.orm.scaffold.index', array('model' => 'SurveyEvaluation', 'locale' => $locale)) => $this->getTranslator()->translate('title.evaluations'),            
+            $this->getUrl('system.orm.scaffold.index', array('model' => 'SurveyEvaluation', 'locale' => $locale)) => $this->getTranslator()->translate('title.evaluations'),
             $this->getUrl('system.orm.scaffold.index', array('model' => 'SurveyLikert', 'locale' => $locale)) => $this->getTranslator()->translate('title.likert'),
         );
     }
 
     /**
-     * Action to set a form with a data object to the view
+     * Action to show the detail of a survey
      * @param \ride\library\i18n\I18n $i18n
      * @param string $locale Locale code of the data
      * @param integer $id Primary key of the data object
@@ -59,7 +61,7 @@ class SurveyController extends ScaffoldController {
 
         $translator = $this->getTranslator();
 
-        // performance table
+        // question table
         $this->model = $this->orm->getSurveyQuestionModel();
         $locales = $i18n->getLocaleCodeList();
         $imageUrlGenerator = $this->dependencyInjector->get('ride\\library\\image\\ImageUrlGenerator');
@@ -122,8 +124,158 @@ class SurveyController extends ScaffoldController {
         ));
 
         $form->processView($view);
-    }    
-    
+    }
+
+    /**
+     * Action to show an entry overview for the probided survey
+     * @param \ride\library\i18n\I18n $i18n
+     * @param string $locale Locale code of the data
+     * @param integer $survey Id of the survey
+     * @return null
+     */
+    public function entriesAction(I18n $i18n, $locale, $survey) {
+        // resolve locale
+        $this->locale = $i18n->getLocale($locale)->getCode();
+
+        // resolve entry
+        if (!$this->isReadable($survey)) {
+            throw new UnauthorizedException();
+        }
+
+        $survey = $this->getEntry($survey);
+        if (!$survey) {
+            $this->response->setStatusCode(Response::STATUS_CODE_NOT_FOUND);
+
+            return;
+        }
+
+        // format entry for title
+        $format = $this->model->getMeta()->getFormat(EntryFormatter::FORMAT_TITLE);
+        $entryFormatter = $this->orm->getEntryFormatter();
+        $title = $entryFormatter->formatEntry($survey, $format);
+
+        $translator = $this->getTranslator();
+
+        // performance table
+        $this->model = $this->orm->getSurveyEntryModel();
+        $locales = $i18n->getLocaleCodeList();
+        $imageUrlGenerator = $this->dependencyInjector->get('ride\\library\\image\\ImageUrlGenerator');
+
+        $urlBase = $this->getUrl('survey.entry', array(
+            'locale' => $this->locale,
+            'survey' => $survey->getId(),
+        ));
+        $urlEntryDetail = $this->getUrl('survey.entry.detail', array(
+            'locale' => $this->locale,
+            'survey' => $survey->getId(),
+            'id' => '%id%',
+        )) . '?referer=' . urlencode($this->request->getUrl());
+
+        $dataDecorator = new DataDecorator($this->model, null, $urlEntryDetail, 'id');
+
+        $table = new ScaffoldTable($this->model, $this->getTranslator(), $this->locale, true, true);
+        $table->setPaginationOptions($this->pagination);
+        $table->addDecorator($dataDecorator);
+        if ($this->model->getMeta()->isLocalized()) {
+            $table->addDecorator(new LocalizeDecorator($this->model, $urlEntryDetail, $this->locale, $locales));
+        }
+        $table->getModelQuery()->addCondition('{survey} = %1%', $survey->getId());
+        $table->addAction(
+            $translator->translate('button.delete'),
+            array($this, 'deleteEntry'),
+            $translator->translate('label.table.confirm.delete')
+        );
+
+        $form = $this->processTable($table, $urlBase, 10, $this->orderMethod, $this->orderDirection);
+        if ($this->response->willRedirect() || $this->response->getView()) {
+            return;
+        }
+
+        // url's
+        $urlBack = $this->request->getQueryParameter('referer');
+        if (!$urlBack) {
+            $urlBack = $this->getAction(self::ACTION_INDEX);
+        }
+
+        // referer to append to urls
+        $urlReferer = '?referer=' . urlencode($this->request->getUrl());
+
+        // set template and vars as response
+        $view = $this->setTemplateView('orm/scaffold/detail.survey.entries', array(
+            'title' => $title,
+            'entry' => $survey,
+            'editUrl' => $this->getAction(self::ACTION_EDIT, array('id' => $survey->getId())) . $urlReferer,
+            'backUrl' => $urlBack,
+            'form' => $form->getView(),
+            'table' => $table,
+            'locales' => $locales,
+            'locale' => $locale,
+            'localizeUrl' => $this->getAction(self::ACTION_DETAIL, array('locale' => '%locale%', 'id' => $survey->getId())),
+        ));
+
+        $form->processView($view);
+    }
+
+    /**
+     * Action to show the detail of a survey entry
+     * @param \ride\library\i18n\I18n $i18n
+     * @param string $locale Locale code of the data
+     * @param string $survey Id of the survey
+     * @param string $id Id of the entry
+     * @return null
+     */
+    public function entryAction(I18n $i18n, $locale, $survey, $id) {
+        // resolve locale
+        $this->locale = $i18n->getLocale($locale)->getCode();
+
+        // resolve entry
+        if (!$this->isReadable($survey)) {
+            throw new UnauthorizedException();
+        }
+
+        $survey = $this->getEntry($survey);
+        if (!$survey) {
+            $this->response->setStatusCode(Response::STATUS_CODE_NOT_FOUND);
+
+            return;
+        }
+
+        // format entry for title
+        $format = $this->model->getMeta()->getFormat(EntryFormatter::FORMAT_TITLE);
+        $entryFormatter = $this->orm->getEntryFormatter();
+        $title = $entryFormatter->formatEntry($survey, $format);
+
+        $translator = $this->getTranslator();
+
+        // performance table
+        $this->model = $this->orm->getSurveyEntryModel();
+
+        $entry = $this->getEntry($id);
+        if (!$entry) {
+            $this->response->setStatusCode(Response::STATUS_CODE_NOT_FOUND);
+
+            return;
+        }
+
+        $evaluationModel = $this->orm->getSurveyEvaluationModel();
+        $evaluations = $evaluationModel->findBySurvey($survey, $locale);
+
+        $urlBack = $this->getReferer();
+        $locales = $i18n->getLocaleCodeList();
+
+        // set template and vars as response
+        $this->setTemplateView('orm/scaffold/detail.survey.entry', array(
+            'title' => $title,
+            'survey' => $survey,
+            'entry' => $entry,
+            'evaluations' => $evaluations,
+            'backUrl' => $urlBack,
+            'locales' => $locales,
+            'locale' => $locale,
+            'localizeUrl' => $this->getAction(self::ACTION_DETAIL, array('locale' => '%locale%', 'survey' => $survey->getId(), 'id' => $id)),
+        ));
+    }
+
     /**
      * Action to add or edit a question
      * @param \ride\library\i18n\I18n $i18n
@@ -206,6 +358,7 @@ class SurveyController extends ScaffoldController {
 
                 // obtain performance from form
                 $question = $form->getData();
+                $question->setLocale($locale);
 
                 $this->model->save($question);
 
@@ -225,7 +378,7 @@ class SurveyController extends ScaffoldController {
 
         $this->setFormView($form, $referer, $i18n->getLocaleCodeList(), $locale, $survey);
     }
-    
+
     /**
      * Action to delete the performance entries from the model
      * @param array $entries Array of entries or entry primary keys
@@ -271,7 +424,6 @@ class SurveyController extends ScaffoldController {
         $referer = $this->getReferer($this->request->getUrl());
 
         $this->response->setRedirect($referer);
-    }    
-    
-    
+    }
+
 }
