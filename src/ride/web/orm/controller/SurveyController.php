@@ -330,7 +330,7 @@ class SurveyController extends ScaffoldController {
                 'required' => array(),
             ),
         ));
-        $form->addRow('description', 'text', array(
+        $form->addRow('description', 'wysiwyg', array(
             'label' => $translator->translate('label.description'),
         ));
         $form->addRow('isOpen', 'option', array(
