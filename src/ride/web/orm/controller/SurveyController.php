@@ -86,7 +86,7 @@ class SurveyController extends ScaffoldController {
         $table->getModelQuery()->addCondition('{survey} = %1%', $id);
         $table->addAction(
             $translator->translate('button.delete'),
-            array($this, 'deleteQuestion'),
+            array($this, 'deleteTableEntry'),
             $translator->translate('label.table.confirm.delete')
         );
 
@@ -182,7 +182,7 @@ class SurveyController extends ScaffoldController {
         $table->getModelQuery()->addCondition('{survey} = %1%', $survey->getId());
         $table->addAction(
             $translator->translate('button.delete'),
-            array($this, 'deleteEntry'),
+            array($this, 'deleteTableEntry'),
             $translator->translate('label.table.confirm.delete')
         );
 
@@ -274,6 +274,99 @@ class SurveyController extends ScaffoldController {
             'locale' => $locale,
             'localizeUrl' => $this->getAction(self::ACTION_DETAIL, array('locale' => '%locale%', 'survey' => $survey->getId(), 'id' => $id)),
         ));
+    }
+
+    /**
+     * Action to show an evaluation overview for the provided survey
+     * @param \ride\library\i18n\I18n $i18n
+     * @param string $locale Locale code of the data
+     * @param integer $survey Id of the survey
+     * @return null
+     */
+    public function evaluationsAction(I18n $i18n, $locale, $survey) {
+        // resolve locale
+        $this->locale = $i18n->getLocale($locale)->getCode();
+
+        // resolve entry
+        if (!$this->isReadable($survey)) {
+            throw new UnauthorizedException();
+        }
+
+        $survey = $this->getEntry($survey);
+        if (!$survey) {
+            $this->response->setStatusCode(Response::STATUS_CODE_NOT_FOUND);
+
+            return;
+        }
+
+        // format entry for title
+        $format = $this->model->getMeta()->getFormat(EntryFormatter::FORMAT_TITLE);
+        $entryFormatter = $this->orm->getEntryFormatter();
+        $title = $entryFormatter->formatEntry($survey, $format);
+
+        $translator = $this->getTranslator();
+
+        // performance table
+        $this->model = $this->orm->getSurveyEvaluationModel();
+        $locales = $i18n->getLocaleCodeList();
+        $imageUrlGenerator = $this->dependencyInjector->get('ride\\library\\image\\ImageUrlGenerator');
+
+        $urlBase = $this->getUrl('survey.evaluation', array(
+            'locale' => $this->locale,
+            'survey' => $survey->getId(),
+        ));
+        $urlEntryDetail = $this->getUrl('system.orm.scaffold.action.entry', array(
+            'model' => 'SurveyEvaluation',
+            'action' => 'edit',
+            'locale' => $this->locale,
+            'survey' => $survey->getId(),
+            'id' => '%id%',
+        )) . '?referer=' . urlencode($this->request->getUrl());
+
+        $dataDecorator = new DataDecorator($this->model, null, $urlEntryDetail, 'id');
+
+        $table = new ScaffoldTable($this->model, $this->getTranslator(), $this->locale, true, true);
+        $table->setPaginationOptions($this->pagination);
+        $table->addDecorator($dataDecorator);
+        if ($this->model->getMeta()->isLocalized()) {
+            $table->addDecorator(new LocalizeDecorator($this->model, $urlEntryDetail, $this->locale, $locales));
+        }
+        $table->getModelQuery()->addCondition('{questions.survey} = %1%', $survey->getId());
+        $table->addAction(
+            $translator->translate('button.delete'),
+            array($this, 'deleteTableEntry'),
+            $translator->translate('label.table.confirm.delete')
+        );
+
+        $form = $this->processTable($table, $urlBase, 10, $this->orderMethod, $this->orderDirection);
+        if ($this->response->willRedirect() || $this->response->getView()) {
+            return;
+        }
+
+        // url's
+        $urlBack = $this->request->getQueryParameter('referer');
+        if (!$urlBack) {
+            $urlBack = $this->getAction(self::ACTION_INDEX);
+        }
+
+        // referer to append to urls
+        $urlReferer = '?referer=' . urlencode($this->request->getUrl());
+
+        // set template and vars as response
+        $view = $this->setTemplateView('orm/scaffold/detail.survey.evaluations', array(
+            'title' => $title,
+            'entry' => $survey,
+            'addEvaluationUrl' => $this->getUrl('system.orm.scaffold.action', array('model' => 'SurveyEvaluation', 'locale' => $locale, 'action' => 'add')) . $urlReferer,
+            'editUrl' => $this->getAction(self::ACTION_EDIT, array('id' => $survey->getId())) . $urlReferer,
+            'backUrl' => $urlBack,
+            'form' => $form->getView(),
+            'table' => $table,
+            'locales' => $locales,
+            'locale' => $locale,
+            'localizeUrl' => $this->getAction(self::ACTION_DETAIL, array('locale' => '%locale%', 'id' => $survey->getId())),
+        ));
+
+        $form->processView($view);
     }
 
     /**
@@ -384,7 +477,7 @@ class SurveyController extends ScaffoldController {
      * @param array $entries Array of entries or entry primary keys
      * @return null
      */
-    public function deleteQuestion($entries) {
+    public function deleteTableEntry($entries) {
         if (!$entries || !$this->isDeletable()) {
             return;
         }

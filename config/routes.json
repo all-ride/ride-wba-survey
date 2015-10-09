@@ -31,6 +31,12 @@
             "id": "survey.edit"
         },
         {
+            "path": "/admin/surveys/%locale%/%survey%/evaluations",
+            "controller": "ride\\web\\orm\\controller\\SurveyController",
+            "action": "evaluationsAction",
+            "id": "survey.evaluation"
+        },
+        {
             "path": "/admin/surveys/%locale%/%survey%/entries",
             "controller": "ride\\web\\orm\\controller\\SurveyController",
             "action": "entriesAction",
