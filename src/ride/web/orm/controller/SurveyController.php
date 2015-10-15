@@ -42,6 +42,7 @@ class SurveyController extends ScaffoldController {
     public function detailAction(I18n $i18n, $locale, $id) {
         // resolve locale
         $this->locale = $i18n->getLocale($locale)->getCode();
+        $this->orm->setLocale($this->locale);
 
         // resolve entry
         if (!$this->isReadable($id)) {
@@ -137,6 +138,7 @@ class SurveyController extends ScaffoldController {
     public function entriesAction(I18n $i18n, $locale, $survey) {
         // resolve locale
         $this->locale = $i18n->getLocale($locale)->getCode();
+        $this->orm->setLocale($this->locale);
 
         // resolve entry
         if (!$this->isReadable($survey)) {
@@ -228,12 +230,12 @@ class SurveyController extends ScaffoldController {
     public function entryAction(I18n $i18n, $locale, $survey, $id) {
         // resolve locale
         $this->locale = $i18n->getLocale($locale)->getCode();
+        $this->orm->setLocale($this->locale);
 
         // resolve entry
         if (!$this->isReadable($survey)) {
             throw new UnauthorizedException();
         }
-
         $survey = $this->getEntry($survey);
         if (!$survey) {
             $this->response->setStatusCode(Response::STATUS_CODE_NOT_FOUND);
@@ -287,6 +289,7 @@ class SurveyController extends ScaffoldController {
     public function evaluationsAction(I18n $i18n, $locale, $survey) {
         // resolve locale
         $this->locale = $i18n->getLocale($locale)->getCode();
+        $this->orm->setLocale($this->locale);
 
         // resolve entry
         if (!$this->isReadable($survey)) {
@@ -381,6 +384,7 @@ class SurveyController extends ScaffoldController {
     public function questionFormAction(I18n $i18n, $locale, WebApplication $web, ReflectionHelper $reflectionHelper, $survey, $id = null) {
         // resolve locale
         $this->locale = $i18n->getLocale($locale)->getCode();
+        $this->orm->setLocale($this->locale);
 
         // resolve event
         if (!$this->isReadable($survey)) {
