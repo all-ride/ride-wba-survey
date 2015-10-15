@@ -2,6 +2,7 @@
 
 namespace ride\web\orm\controller;
 
+use ride\library\http\Response;
 use ride\library\i18n\I18n;
 use ride\library\orm\entry\format\EntryFormatter;
 use ride\library\orm\model\Model;
