@@ -456,7 +456,11 @@ class SurveyController extends ScaffoldController {
 
                 // obtain performance from form
                 $question = $form->getData();
+
                 $question->setLocale($locale);
+                foreach ($question->getAnswers() as $answer) {
+                    $answer->setLocale($locale);
+                }
 
                 $this->model->save($question);
 
