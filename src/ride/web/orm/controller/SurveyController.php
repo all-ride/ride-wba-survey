@@ -478,7 +478,20 @@ class SurveyController extends ScaffoldController {
 
         $this->templateForm = 'orm/scaffold/form';
 
-        $this->setFormView($form, $referer, $i18n->getLocaleCodeList(), $locale, $survey);
+        if ($question && $question->getId()) {
+            $localizeUrl = $this->getUrl('survey.question.edit', array(
+                'locale' => '%locale%',
+                'survey' => $survey->getId(),
+                'id' => $question->getId(),
+            ));
+        } else {
+            $localizeUrl = $this->getUrl('survey.question.add', array('locale' => '%locale%', 'survey' => $survey->getId()));
+        }
+
+        $localizeUrl .= '?referer=' . urlencode($this->request->getUrl());
+
+        $view = $this->setFormView($form, $referer, $i18n->getLocaleCodeList(), $locale, $survey);
+        $view->getTemplate()->set('localizeUrl', $localizeUrl);
     }
 
     /**
