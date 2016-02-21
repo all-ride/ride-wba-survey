@@ -2,7 +2,7 @@
     "name": "ride/wba-survey",
     "description": "Survey backend for the Ride base application",
     "license": "MIT",
-    "version": "0.3.4",
+    "version": "0.3.5",
     "authors": [
         {
             "name": "Joris Vandeweerd",
