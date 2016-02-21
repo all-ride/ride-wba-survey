@@ -15,8 +15,8 @@ class SurveyEvaluationController extends ScaffoldController {
      */
     protected function getIndexActions($locale) {
         return array(
-            $this->getUrl('system.orm.scaffold.index', array('model' => 'Survey', 'locale' => $locale)) => $this->getTranslator()->translate('title.surveys'),
-            $this->getUrl('system.orm.scaffold.index', array('model' => 'SurveyLikert', 'locale' => $locale)) => $this->getTranslator()->translate('title.likert'),
+            (string) $this->getUrl('system.orm.scaffold.index', array('model' => 'Survey', 'locale' => $locale)) => $this->getTranslator()->translate('title.surveys'),
+            (string) $this->getUrl('system.orm.scaffold.index', array('model' => 'SurveyLikert', 'locale' => $locale)) => $this->getTranslator()->translate('title.likert'),
         );
     }
 
