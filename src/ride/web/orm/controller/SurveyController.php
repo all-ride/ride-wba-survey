@@ -80,7 +80,7 @@ class SurveyController extends ScaffoldController {
 
         $dataDecorator = new DataDecorator($this->model, null, $urlQuestionEdit, 'id');
 
-        $table = new ScaffoldTable($this->model, $this->getTranslator(), $this->locale, true, false);
+        $table = new ScaffoldTable($this->model, $this->getTranslator(), $this->locale, true, true);
         $table->addDecorator($dataDecorator);
         if ($this->model->getMeta()->isLocalized()) {
             $table->addDecorator(new LocalizeDecorator($this->model, $urlQuestionEdit, $this->locale, $locales));
