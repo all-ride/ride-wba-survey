@@ -3,6 +3,7 @@
     "label.answer.likert.description": "Define a Likert scale for this answer",
     "label.answers": "Answers",
     "label.body": "Body",
+    "label.description": "Description",
     "label.likert": "Likert scale",
     "label.question": "Question",
     "label.question.open": "Open question",
